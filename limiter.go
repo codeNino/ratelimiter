@@ -39,6 +39,7 @@ type RateLimiter struct {
 
 // note total requests made with user parameters and update per new request made
 func (limiter *RateLimiter) UpdateTotalRequests(user_params ...string) {
+
 	key_arr := append(user_params, limiter.TotalLimitPrefix)
 	key := strings.Join(key_arr, "_")
 	var bck bucket
