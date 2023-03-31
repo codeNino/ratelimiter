@@ -115,7 +115,7 @@ func (limiter *RateLimiter) AllowConsecutiveRequest(user_params ...string) bool 
 }
 
 // note consecutive and total requests in made with user parameters and update each as per new request made
-func (limiter *RateLimiter) NoteRequest(user_params ...string) {
+func (limiter *RateLimiter) UpdateRequest(user_params ...string) {
 	var wg sync.WaitGroup
 	wg.Add(2)
 	go func() {
