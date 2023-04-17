@@ -54,7 +54,7 @@ func testHTTPResponse(t *testing.T, r *gin.Engine, req *http.Request, f func(w *
 // Helper function to process a request and test its response
 func testMiddlewareRequest(url string, t *testing.T, r *gin.Engine, expectedHTTPCode int) {
 	req, _ := http.NewRequest("GET", url, nil)
-	req.Header.Set("X-REAL-IP", "105.112.114.123")
+	req.Header.Set("X-REAL-IP", "000.111.222.333")
 
 	testHTTPResponse(t, r, req, func(w *httptest.ResponseRecorder) bool {
 		return w.Code == expectedHTTPCode
@@ -63,8 +63,6 @@ func testMiddlewareRequest(url string, t *testing.T, r *gin.Engine, expectedHTTP
 
 // Test that a GET request to the ExampleGet1 endpoint returns the HTTP code 200
 func TestFirstGetExample1Call(t *testing.T) {
-
-	rdb.FlushDB()
 
 	r := getRouter(true)
 
@@ -86,4 +84,5 @@ func TestSubsequentGetExample1Call(t *testing.T) {
 
 	testMiddlewareRequest("/ExampleGet1", t, r, http.StatusTooManyRequests)
 
+	rdb.FlushDB()
 }
