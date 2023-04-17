@@ -63,7 +63,7 @@ func (limiter *RateLimiter) AllowWithinTotalRequests(user_params ...string) bool
 	var bck bucket
 	err := bck.unmarshalBinary([]byte(limiter.Client.Get(key).Val()))
 	if err != nil {
-		return false
+		return true
 	} else {
 		if bck.Attempts >= limiter.TotalLimit {
 			if time.Now().After(bck.BlockTill) {
@@ -101,7 +101,7 @@ func (limiter *RateLimiter) AllowConsecutiveRequest(user_params ...string) bool 
 	var bck bucket
 	err := bck.unmarshalBinary([]byte(limiter.Client.Get(key).Val()))
 	if err != nil {
-		return false
+		return true
 	} else {
 		if bck.Attempts >= limiter.BurstLimit {
 			if time.Now().After(bck.BlockTill) {

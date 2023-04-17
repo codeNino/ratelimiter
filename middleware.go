@@ -13,6 +13,7 @@ import (
 func GetIPAddress(c *gin.Context) (string, error) {
 	//Get IP from the X-REAL-IP header
 	ip := c.Request.Header.Get("X-REAL-IP")
+	// fmt.Printf("Here's the raw  ip ==> %v", ip)
 	netIP := net.ParseIP(ip)
 	if netIP != nil {
 		return ip, nil
@@ -20,6 +21,7 @@ func GetIPAddress(c *gin.Context) (string, error) {
 
 	//Get IP from X-FORWARDED-FOR header
 	ips := c.Request.Header.Get("X-FORWARDED-FOR")
+	// fmt.Printf("Here's the raw  ip ==> %v", ip)
 	splitIps := strings.Split(ips, ",")
 	for _, ip := range splitIps {
 		netIP := net.ParseIP(ip)
@@ -30,6 +32,7 @@ func GetIPAddress(c *gin.Context) (string, error) {
 
 	//Get IP from RemoteAddr
 	ip, _, err := net.SplitHostPort(c.Request.RemoteAddr)
+	// fmt.Printf("Here's the raw  ip ==> %v", ip)
 	if err != nil {
 		return "", err
 	}
@@ -49,11 +52,15 @@ func IPLimiter(limiter RateLimiter) gin.HandlerFunc {
 		if err != nil {
 			log.Println(err)
 			c.AbortWithError(401, errors.New("IP Adress Unknown"))
+			return
 		}
 
 		if !limiter.AllowRequest(ip_addr) {
 			c.AbortWithError(429, errors.New("Too Many Requests Made, Retry Later"))
+			return
 		}
+
+		limiter.UpdateRequest(ip_addr)
 
 		c.Next()
 	}
@@ -66,7 +73,10 @@ func UserLimiter(limiter RateLimiter, user_id string) gin.HandlerFunc {
 
 		if !limiter.AllowRequest(user_id) {
 			c.AbortWithError(429, errors.New("Too Many Requests Made, Retry Later"))
+			return
 		}
+
+		limiter.UpdateRequest(user_id)
 
 		c.Next()
 	}
@@ -81,11 +91,15 @@ func IPUserLimiter(limiter RateLimiter, user_id string) gin.HandlerFunc {
 		if err != nil {
 			log.Println(err)
 			c.AbortWithError(401, errors.New("IP Adress Unknown"))
+			return
 		}
 
 		if !limiter.AllowRequest(ip_addr, user_id) {
 			c.AbortWithError(429, errors.New("Too Many Requests Made, Retry Later"))
+			return
 		}
+
+		limiter.UpdateRequest(ip_addr, user_id)
 
 		c.Next()
 	}
